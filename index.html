@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hearly</title>
+</head>
+<link rel="stylesheet" href="css/style.css">
+<style>
+    /*CSS Reset*/
+    body{
+        
+
+    color: aliceblue;
+        margin: 0px;
+        padding: 0px;
+        background: url('img/bg.jpg');
+
+    }
+    
+    
+    .left{
+        position: absolute;
+        left: 60px;
+        top: 20px;
+        display: inline-block;
+        /*border: 2px solid rgb(247, 243, 243); */
+
+    }
+    .left img{
+        width: 300px;
+        filter: invert(100%);
+    }
+    .left div{
+        text-align: center;
+        line-height: 0px;
+        font-size: 110px;
+    }
+    .mid{
+        display: block;
+        width: 50%;
+        margin: 20px auto;
+        text-align: center;
+      /*  border: 2px solid rgb(27, 229, 236); */
+
+    }
+    .right{
+        position: absolute;
+        right: 30px;
+        top: 20px;
+        display: inline-block;
+       /* border: 2px solid rgb(241, 21, 208); */
+
+    }
+    .navbar{
+        display: inline-block;
+    }
+
+    .navbar li{
+        font-size: 150px;
+       
+        display: inline-block;
+    }
+
+    .navbar li a{
+        color: rgb(255, 255, 255) ;
+        text-decoration: none;
+        padding: 100px;
+    }
+
+    .navbar li a:hover, .navbar li a.active{
+      text-decoration: underline;
+      color: grey;
+    }
+.btn{
+
+    margin: 0px 9px;
+    background-color: rgb(144, 144, 144);
+    color: white;
+    padding: 4px 14px;
+    border: 9px solid rgb(0, 0, 0);
+    border-radius: 10px;
+    font-size: 70px;
+    cursor: pointer;
+
+}
+.btn:hover{
+    background-color: rgb(88, 86, 86);
+}
+
+.container{
+   /* border: 2px solid rgb(255, 255, 255); */
+    margin: 400px 2000px;
+    padding: 75px;
+    width: 33%;
+    border-radius: 28px;
+    color: rgb(0, 0, 0);
+}
+
+.form-group input{
+    text-align: center;
+    display: block;
+    width: 2000px;
+    padding: 9px;
+    border: 2px solid black;
+    margin: 20px auto;
+    border-radius: 8px;
+    font-size: 70px;
+
+}
+.container h1{
+    text-align: center;
+    font-size: 150px;
+}
+
+.container button{
+    display: block;
+    width: 23%;
+    margin: auto;
+    color: rgb(249, 248, 250);
+    
+    
+}
+</style>
+<body>
+    <header class="header">
+                <!--left for logo-->
+                <div class="left">
+                    <img src="img/logo-removebg-preview.png" alt="">
+                  <div>Hearly</div>
+                            </div>
+                            <!--mid for nav-->
+                            <div class="mid">
+                                <ul class="navbar">
+                                    <li><a href="#" class="active">Home</a></li>
+                                    <li><a href="#">About Us</a></li>
+                                    <li><a href="#">Genre</a></li>
+                                    <li><a href="#">Contact Us</a></li>
+                                   </ul>
+                            </div>
+                            <!--right fot buttons-->
+                            <div class="right">
+                    <button class="btn">Call Us</button>
+                    <button class="btn">Email</button>
+                            </div>
+    </header>
+    <div class="container">
+      <h1>Get Started with the Melodeous Hearly</h1>
+      <form action="noaction.php">
+        <div class="form-group">
+            <input type="text" name"" placeholder="Enter your Name">
+        </div>
+        <div class="form-group">
+            <input type="text" name"" placeholder="Enter your Contact no.">
+        </div>
+        <div class="form-group">
+            <input type="text" name"" placeholder="Enter yout Email">
+        </div>
+        <div class="form-group">
+            <input type="text" name"" placeholder="Password">
+        </div>
+        <button class="btn">Login</button>
+        <button class="btn">SignIN</button>
+        <button class="btn">Forget Password</button>
+      </form>
+    
+</div>
+    
+</body>
+</html>
