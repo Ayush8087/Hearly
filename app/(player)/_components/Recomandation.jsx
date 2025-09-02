@@ -17,21 +17,28 @@ export default function Recomandation({ id }) {
     const getData = async () => {
         await getSongsSuggestions(id)
             .then(res => res.json())
-            .then(data => {
-                if (data) {
-                    setData(data.data);
-                    let d = data.data[Math.floor(Math.random() * data?.data?.length)];
-                    next.setNextData({
-                        id: d.id,
-                        name: d.name,
-                        artist: d.artists.primary[0]?.name || "unknown",
-                        album: d.album.name,
-                        image: d.image[1].url
-                    });
-                }
-                else {
+            .then(payload => {
+                const results = Array.isArray(payload?.data) ? payload.data : [];
+                if (results.length > 0) {
+                    setData(results);
+                    const randomIndex = Math.floor(Math.random() * results.length);
+                    const d = results[randomIndex];
+                    if (d) {
+                        next.setNextData({
+                            id: d.id,
+                            name: d.name,
+                            artist: d?.artists?.primary?.[0]?.name || "unknown",
+                            album: d?.album?.name,
+                            image: d?.image?.[2]?.url || d?.image?.[1]?.url || d?.image?.[0]?.url || ""
+                        });
+                    }
+                } else {
                     setData(false);
                 }
+                setLoading(false);
+            })
+            .catch(() => {
+                setData(false);
                 setLoading(false);
             });
     }
@@ -48,7 +55,14 @@ export default function Recomandation({ id }) {
                 {!loading && data && (
                     <div className="grid sm:grid-cols-2 gap-3 overflow-hidden">
                         {data.map((song) => (
-                            <Next next={false} key={song.id} image={song.image[2].url} name={song.name} artist={song.artists.primary[0]?.name || "unknown"} id={song.id} />
+                            <Next
+                                next={false}
+                                key={song.id}
+                                image={song?.image?.[2]?.url || song?.image?.[1]?.url || song?.image?.[0]?.url || ""}
+                                name={song.name}
+                                artist={song?.artists?.primary?.[0]?.name || "unknown"}
+                                id={song.id}
+                            />
                         ))}
                     </div>
                 )}

@@ -5,6 +5,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from "sonner";
 import MobileMenu from "@/components/mobile-menu";
 import MusicProvider from "@/components/music-provider";
+import AuthProvider from "@/components/auth-provider";
 
 const bricolage_grotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -12,7 +13,7 @@ const bricolage_grotesque = Bricolage_Grotesque({
 });
 
 export const metadata = {
-  title: "MusicHub",
+  title: "Hearly",
   description: "Open-Source music streamer.",
   icons: "/favi-icon.jpg",
   manifest: "/manifest.json",
@@ -43,9 +44,11 @@ export default function RootLayout({ children }) {
             zIndex={1600}
             showAtBottom={false}
           />
-          <MusicProvider>
-            {children}
-          </MusicProvider>
+          <AuthProvider>
+            <MusicProvider>
+              {children}
+            </MusicProvider>
+          </AuthProvider>
           {/* <MobileMenu/> */}
           <Toaster position="top-center" visibleToasts={1} />
         </ThemeProvider>

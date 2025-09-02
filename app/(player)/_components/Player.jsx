@@ -1,7 +1,9 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { getSongsById, getSongsLyricsById } from "@/lib/fetch";
-import { Download, Pause, Play, RedoDot, UndoDot, Repeat, Loader2, Bookmark, BookmarkCheck, Repeat1, Share2 } from "lucide-react";
+import { Download, Pause, Play, RedoDot, UndoDot, Repeat, Loader2, BookmarkPlus, Repeat1, Share2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
@@ -22,6 +24,8 @@ export default function Player({ id }) {
     const [isDownloading, setIsDownloading] = useState(false);
     const [isLooping, setIsLooping] = useState(false);
     const [audioURL, setAudioURL] = useState("");
+    const [playlists, setPlaylists] = useState([]);
+    const [newPlaylistName, setNewPlaylistName] = useState("");
     const params = useSearchParams();
     const next = useContext(NextContext);
     const { current, setCurrent } = useMusic();
@@ -92,9 +96,50 @@ export default function Player({ id }) {
         }
     }
 
+    const addToPlaylist = async () => {
+        try {
+            const res = await fetch('/api/playlists/add-song', { method: 'POST', body: JSON.stringify({ songId: id }) });
+            if (!res.ok) return toast.error('Sign in to save to playlist');
+            toast.success('Added to My Favorites');
+        } catch {
+            toast.error('Could not add to playlist');
+        }
+    }
+
+    const fetchPlaylists = async () => {
+        try {
+            const res = await fetch('/api/playlists');
+            if (res.ok) setPlaylists(await res.json());
+        } catch {}
+    };
+
+    const addToSpecific = async (playlistId) => {
+        try {
+            const res = await fetch('/api/playlists/add-song', { method: 'POST', body: JSON.stringify({ songId: id, playlistId }) });
+            if (!res.ok) return toast.error('Sign in to save to playlist');
+            toast.success('Added to playlist');
+        } catch {
+            toast.error('Could not add to playlist');
+        }
+    };
+
+    const createAndAdd = async () => {
+        if (!newPlaylistName.trim()) return;
+        try {
+            const res = await fetch('/api/playlists/add-song', { method: 'POST', body: JSON.stringify({ songId: id, playlistName: newPlaylistName.trim() }) });
+            if (!res.ok) return toast.error('Sign in to save to playlist');
+            setNewPlaylistName("");
+            toast.success('Added to new playlist');
+            fetchPlaylists();
+        } catch {
+            toast.error('Could not add to playlist');
+        }
+    };
+
 
     useEffect(() => {
         getSong();
+        fetchPlaylists();
         localStorage.setItem("last-played", id);
         localStorage.removeItem("p");
         if (current) {
@@ -192,6 +237,23 @@ export default function Player({ id }) {
                                                 <Download className="h-4 w-4" />
                                             )}
                                         </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button size="icon" variant="ghost"><BookmarkPlus className="h-4 w-4" /></Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem onClick={addToPlaylist}>Add to My Favorites</DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                {playlists.map((p) => (
+                                                    <DropdownMenuItem key={p.id} onClick={() => addToSpecific(p.id)}>Add to {p.name}</DropdownMenuItem>
+                                                ))}
+                                                <DropdownMenuSeparator />
+                                                <div className="p-2 grid gap-2">
+                                                    <Input placeholder="New playlist name" value={newPlaylistName} onChange={(e) => setNewPlaylistName(e.target.value)} />
+                                                    <Button size="sm" onClick={createAndAdd}>Create & Add</Button>
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                         <Button size="icon" variant="ghost" onClick={handleShare}><Share2 className="h-4 w-4" /></Button>
                                     </div>
                                 </div>

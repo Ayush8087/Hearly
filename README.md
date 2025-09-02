@@ -1,6 +1,6 @@
-# MusicHub
+# Hearly
 
-MusicHub is a web music app built using Next.js 14, App Router, and an unofficial music API. The user interface is styled with Tailwind CSS.
+Hearly is a web music app built using Next.js 14, App Router, and an unofficial music API. The user interface is styled with Tailwind CSS.
 
 <br/>
 
@@ -43,7 +43,7 @@ Mobile Player
 
 ```bash
 git clone https://github.com/Ayush8087/MusicHub
-cd musichub
+cd hearly
 ```
 
 2. Install dependencies:
@@ -58,7 +58,7 @@ npm install or pnpm install
 npm run dev or pnpm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser to explore MusicHub.
+Visit [http://localhost:3000](http://localhost:3000) in your browser to explore Hearly.
 
 ## Setup Api
 
@@ -68,6 +68,4 @@ fork and deploy your own repo of `https://github.com/sumitkolhe/jiosaavn-api` ge
 
 Contributions are welcome! Please follow our [Contribution Guidelines](CONTRIBUTING.md).
 
-## License
 
-This project is licensed under the [MIT License](LICENSE).

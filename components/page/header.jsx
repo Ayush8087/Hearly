@@ -6,9 +6,11 @@ import Search from "./search";
 import { ChevronDown, ChevronLeft, Share2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function Header() {
     const path = usePathname();
+    const { data: session } = useSession();
     return (
         <header className="grid gap-2 pt-5 px-5 pb-5 md:px-20 lg:px-32">
             <div className="flex items-center sm:justify-between w-full gap-2">
@@ -27,6 +29,23 @@ export default function Header() {
                     <Search />
                     {path != "/" && (
                         <Button className="h-10 px-3" asChild><Link href="/" className="flex items-center gap-1"><ChevronLeft className="w-4 h-4" />Back</Link></Button>
+                    )}
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <Button variant="ghost" asChild>
+                        <Link href="/playlists">Playlists</Link>
+                    </Button>
+                    {session ? (
+                        <Button variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>Logout</Button>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" asChild>
+                                <Link href="/register">Register</Link>
+                            </Button>
+                            <Button asChild>
+                                <Link href="/login">Login</Link>
+                            </Button>
+                        </div>
                     )}
                 </div>
             </div>
