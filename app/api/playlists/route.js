@@ -10,6 +10,7 @@ async function requireSession() {
 }
 
 export async function GET() {
+  if (!prisma) return new Response("Server not ready (database)", { status: 500 });
   const user = await requireSession();
   if (!user) return new Response("Unauthorized", { status: 401 });
   const lists = await prisma.playlist.findMany({ where: { userId: user.id }, include: { songs: true } });
@@ -17,6 +18,7 @@ export async function GET() {
 }
 
 export async function POST(req) {
+  if (!prisma) return new Response("Server not ready (database)", { status: 500 });
   const user = await requireSession();
   if (!user) return new Response("Unauthorized", { status: 401 });
   const { name } = await req.json();
