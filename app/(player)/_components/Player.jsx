@@ -87,9 +87,8 @@ export default function Player({ id }) {
 
     const handleShare = () => {
         try {
-            navigator.share({
-                url: `https://${window.location.host}/${data.id}`
-            });
+            const base = process.env.NEXT_PUBLIC_SITE_URL || `https://${window.location.host}`;
+            navigator.share({ url: `${base}/${data.id}` });
         }
         catch (e) {
             toast.error('Something went wrong!');
@@ -165,7 +164,8 @@ export default function Player({ id }) {
     useEffect(() => {
         const handleRedirect = () => {
             if (currentTime === duration && !isLooping && duration !== 0) {
-                window.location.href = `https://${window.location.host}/${next?.nextData?.id}`;
+                const base = process.env.NEXT_PUBLIC_SITE_URL || `https://${window.location.host}`;
+                window.location.href = `${base}/${next?.nextData?.id}`;
             }
         };
         if (isLooping || duration === 0) return;
