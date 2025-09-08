@@ -18,18 +18,16 @@ export default function Recomandation({ id }) {
         try {
             const api = `/api/recommendations?songId=${id}`;
             const res = await fetch(api);
-            if (!res.ok) throw new Error('rec_error');
-            const { recommendations } = await res.json();
-            const ids = Array.isArray(recommendations) ? recommendations : [];
-            if (!ids.length) {
-                setData(false);
-                setLoading(false);
-                return;
+            let ids = [];
+            if (res.ok) {
+                const j = await res.json();
+                ids = Array.isArray(j?.recommendations) ? j.recommendations : [];
             }
-            // hydrate minimal display data from suggestions endpoint for UI
             const base = await getSongsSuggestions(id).then(r => r.json()).catch(() => ({ data: [] }));
-            const map = new Map((Array.isArray(base?.data) ? base.data : []).map(c => [c.id, c]));
-            const results = ids.map(rid => map.get(rid)).filter(Boolean);
+            const all = Array.isArray(base?.data) ? base.data : [];
+            const byId = new Map(all.map(c => [c.id, c]));
+            let results = ids.map(rid => byId.get(rid)).filter(Boolean);
+            if (!results.length) results = all;
             setData(results.length ? results : false);
             if (results.length) {
                 const d = results[0];

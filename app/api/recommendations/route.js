@@ -12,7 +12,7 @@ export async function GET(req) {
     const candidates = Array.isArray(payload?.data) ? payload.data : [];
     if (!candidates.length) return Response.json({ recommendations: [] });
 
-    const apiKey = process.env.OPENAI_API_KEY || "sk-ijklmnopqrstuvwxijklmnopqrstuvwxijklmnop";
+    const apiKey = process.env.OPENAI_API_KEY;
     const client = new OpenAI({ apiKey });
     const system = "You are a recommender. Given input songs (id, name, primaryArtist, album), respond ONLY with a JSON array of objects with field 'id' of 5 best items. No prose.";
     const user = `Songs: ${JSON.stringify(candidates.map((c) => ({ id: c.id, name: c.name, primaryArtist: c?.artists?.primary?.[0]?.name || "unknown", album: c?.album?.name || "" })))}`;
@@ -37,7 +37,8 @@ export async function GET(req) {
 
     const uniqueOrdered = ids.filter((id, idx) => ids.indexOf(id) === idx && candidates.find((c) => c.id === id));
     const fallback = candidates.map((c) => c.id).filter((id) => !uniqueOrdered.includes(id));
-    const finalIds = [...uniqueOrdered, ...fallback].slice(0, 10);
+    let finalIds = [...uniqueOrdered, ...fallback].slice(0, 10);
+    if (!finalIds.length) finalIds = candidates.map(c => c.id).slice(0, 10);
 
     return Response.json({ recommendations: finalIds });
   } catch (e) {
