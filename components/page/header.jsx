@@ -36,7 +36,7 @@ export default function Header() {
                         <Link href="/playlists">Playlists</Link>
                     </Button>
                     {session ? (
-                        <Button variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>Logout</Button>
+                        <Button variant="outline" onClick={() => signOut({ callbackUrl: typeof window !== 'undefined' ? window.location.origin : "/" })}>Logout</Button>
                     ) : (
                         <div className="flex items-center gap-2">
                             <Button variant="ghost" asChild>

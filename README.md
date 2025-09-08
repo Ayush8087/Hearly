@@ -58,14 +58,11 @@ npm install or pnpm install
 npm run dev or pnpm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser to explore Hearly.
+Visit [https://hearly.onrender.com](https://hearly.onrender.com) in your browser to explore Hearly.
 
 ## Setup Api
 
 fork and deploy your own repo of `https://github.com/sumitkolhe/jiosaavn-api` get the deployment url and paste in .env file refer .env.example
 
-## Contributing
-
-Contributions are welcome! Please follow our [Contribution Guidelines](CONTRIBUTING.md).
 
 

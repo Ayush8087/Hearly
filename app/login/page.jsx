@@ -12,7 +12,7 @@ export default function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const res = await signIn("credentials", { email, password, redirect: true, callbackUrl: "/" });
+    const res = await signIn("credentials", { email, password, redirect: true, callbackUrl: typeof window !== 'undefined' ? window.location.origin : "/" });
     if (res?.error) setError("Invalid credentials");
   };
 
