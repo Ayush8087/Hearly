@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 
 const handler = NextAuth({
   session: { strategy: "jwt" },
+  trustHost: true,
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
       name: "Credentials",
