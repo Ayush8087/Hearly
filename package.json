@@ -37,7 +37,8 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.1",
-    "@google/generative-ai": "^0.21.0"
+    "@google/generative-ai": "^0.21.0",
+    "openai": "^4.56.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",
