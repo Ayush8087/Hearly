@@ -12,7 +12,7 @@ export default function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const res = await signIn("credentials", { email, password, redirect: true, callbackUrl: typeof window !== 'undefined' ? window.location.origin : "/" });
+    const res = await signIn("credentials", { email, password, redirect: true, callbackUrl: "https://hearly.onrender.com/" });
     if (res?.error) setError("Invalid credentials");
   };
 
