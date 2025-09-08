@@ -16,22 +16,30 @@ export default function Recomandation({ id }) {
 
     const getData = async () => {
         try {
-            const res = await getSongsSuggestions(id);
-            const payload = await res.json();
-            const results = Array.isArray(payload?.data) ? payload.data : [];
+            const api = `/api/recommendations?songId=${id}`;
+            const res = await fetch(api);
+            if (!res.ok) throw new Error('rec_error');
+            const { recommendations } = await res.json();
+            const ids = Array.isArray(recommendations) ? recommendations : [];
+            if (!ids.length) {
+                setData(false);
+                setLoading(false);
+                return;
+            }
+            // hydrate minimal display data from suggestions endpoint for UI
+            const base = await getSongsSuggestions(id).then(r => r.json()).catch(() => ({ data: [] }));
+            const map = new Map((Array.isArray(base?.data) ? base.data : []).map(c => [c.id, c]));
+            const results = ids.map(rid => map.get(rid)).filter(Boolean);
             setData(results.length ? results : false);
             if (results.length) {
-                const randomIndex = Math.floor(Math.random() * results.length);
-                const d = results[randomIndex];
-                if (d) {
-                    next.setNextData({
-                        id: d.id,
-                        name: d.name,
-                        artist: d?.artists?.primary?.[0]?.name || "unknown",
-                        album: d?.album?.name,
-                        image: d?.image?.[2]?.url || d?.image?.[1]?.url || d?.image?.[0]?.url || ""
-                    });
-                }
+                const d = results[0];
+                next.setNextData({
+                    id: d.id,
+                    name: d.name,
+                    artist: d?.artists?.primary?.[0]?.name || "unknown",
+                    album: d?.album?.name,
+                    image: d?.image?.[2]?.url || d?.image?.[1]?.url || d?.image?.[0]?.url || ""
+                });
             }
         } catch {
             setData(false);
