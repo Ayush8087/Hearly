@@ -31,15 +31,17 @@ export default function Player({ id }) {
     const { current, setCurrent } = useMusic();
 
     const getSong = async () => {
-        const get = await getSongsById(id);
-        const data = await get.json();
-        setData(data.data[0]);
-        if (data?.data[0]?.downloadUrl[2]?.url) {
-            setAudioURL(data?.data[0]?.downloadUrl[2]?.url);
-        } else if (data?.data[0]?.downloadUrl[1]?.url) {
-            setAudioURL(data?.data[0]?.downloadUrl[1]?.url);
-        } else {
-            setAudioURL(data?.data[0]?.downloadUrl[0]?.url);
+        try {
+            const get = await getSongsById(id);
+            const payload = await get.json();
+            const song = payload?.data?.[0];
+            if (!song) throw new Error('No song data');
+            setData(song);
+            const urls = song?.downloadUrl || [];
+            const preferred = urls[2]?.url || urls[1]?.url || urls[0]?.url || "";
+            setAudioURL(preferred);
+        } catch (e) {
+            toast.error('Something went wrong!');
         }
     };
 
@@ -162,7 +164,7 @@ export default function Player({ id }) {
         };
     }, []);
     useEffect(() => {
-        const autoplayNext = () => {
+        const autoplayNext = async () => {
             if (isLooping || duration === 0) return;
             if (currentTime < duration - 0.25) return;
 
@@ -171,10 +173,19 @@ export default function Player({ id }) {
             const currentIndex = posParam ? parseInt(posParam, 10) : null;
 
             if (playlistId && currentIndex !== null && !Number.isNaN(currentIndex)) {
-                const base = `https://${window.location.host}`;
-                const nextIndex = currentIndex + 1;
-                window.location.href = `${base}/${id}?playlist=${playlistId}&pos=${nextIndex}`;
-                return;
+                try {
+                    const res = await fetch(`/api/playlists/${playlistId}`);
+                    if (!res.ok) throw new Error('Failed to load playlist');
+                    const list = await res.json();
+                    const songIds = (list?.songs || []).map(s => s.songId);
+                    const nextIndex = currentIndex + 1;
+                    const nextId = songIds[nextIndex];
+                    if (nextId) {
+                        const base = `https://${window.location.host}`;
+                        window.location.href = `${base}/${nextId}?playlist=${playlistId}&pos=${nextIndex}`;
+                        return;
+                    }
+                } catch {}
             }
 
             if (next?.nextData?.id) {
@@ -183,7 +194,7 @@ export default function Player({ id }) {
             }
         };
         autoplayNext();
-    }, [currentTime, duration, isLooping]);
+    }, [currentTime, duration, isLooping, params]);
     return (
         <div className="mb-3 mt-10">
             <audio onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedData={() => setDuration(audioRef.current.duration)} autoPlay={playing} src={audioURL} ref={audioRef}></audio>

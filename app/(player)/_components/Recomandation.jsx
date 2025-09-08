@@ -44,7 +44,7 @@ export default function Recomandation({ id }) {
     }
     useEffect(() => {
         getData();
-    }, [])
+    }, [id])
     return (
         <section className="py-10 px-6 md:px-20 lg:px-32">
             <div>
