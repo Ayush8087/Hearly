@@ -1,10 +1,12 @@
 "use client"
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,8 +14,12 @@ export default function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const res = await signIn("credentials", { email, password, redirect: true, callbackUrl: "https://hearly.onrender.com/" });
-    if (res?.error) setError("Invalid credentials");
+    const res = await signIn("credentials", { email, password, redirect: false });
+    if (res?.error) {
+      setError("Invalid credentials");
+      return;
+    }
+    router.replace("/");
   };
 
   return (

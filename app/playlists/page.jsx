@@ -28,7 +28,7 @@ export default function PlaylistsPage() {
       <div className="px-6 py-10 md:px-20 lg:px-32">
         <h1 className="text-xl mb-4">Your playlists</h1>
         <p className="mb-4 text-sm text-muted-foreground">Sign in to manage playlists.</p>
-        <Button onClick={() => signIn(undefined, { callbackUrl: "https://hearly.onrender.com/" })}>Sign in</Button>
+        <Button onClick={() => signIn(undefined, { redirect: true, callbackUrl: "/" })}>Sign in</Button>
       </div>
     );
   }
