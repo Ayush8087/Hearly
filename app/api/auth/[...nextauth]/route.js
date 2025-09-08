@@ -7,6 +7,18 @@ const handler = NextAuth({
   session: { strategy: "jwt" },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      const siteUrl = process.env.NEXTAUTH_URL || 'https://hearly.onrender.com';
+      const effectiveBase = baseUrl || siteUrl;
+      try {
+        const target = new URL(url, effectiveBase);
+        if (target.origin === new URL(effectiveBase).origin) return target.toString();
+      } catch {}
+      if (url.startsWith('/')) return `${effectiveBase}${url}`;
+      return effectiveBase;
+    },
+  },
   providers: [
     Credentials({
       name: "Credentials",
