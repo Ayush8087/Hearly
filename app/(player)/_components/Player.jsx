@@ -162,15 +162,28 @@ export default function Player({ id }) {
         };
     }, []);
     useEffect(() => {
-        const handleRedirect = () => {
-            if (currentTime === duration && !isLooping && duration !== 0) {
-                const base = process.env.NEXT_PUBLIC_SITE_URL || `https://${window.location.host}`;
-                window.location.href = `${base}/${next?.nextData?.id}`;
+        const autoplayNext = () => {
+            if (isLooping || duration === 0) return;
+            if (currentTime < duration - 0.25) return;
+
+            const playlistId = params.get('playlist');
+            const posParam = params.get('pos');
+            const currentIndex = posParam ? parseInt(posParam, 10) : null;
+
+            if (playlistId && currentIndex !== null && !Number.isNaN(currentIndex)) {
+                const base = `https://${window.location.host}`;
+                const nextIndex = currentIndex + 1;
+                window.location.href = `${base}/${id}?playlist=${playlistId}&pos=${nextIndex}`;
+                return;
+            }
+
+            if (next?.nextData?.id) {
+                const base = `https://${window.location.host}`;
+                window.location.href = `${base}/${next.nextData.id}`;
             }
         };
-        if (isLooping || duration === 0) return;
-        return handleRedirect();
-    }, [currentTime, duration, isLooping, next?.nextData?.id]);
+        autoplayNext();
+    }, [currentTime, duration, isLooping]);
     return (
         <div className="mb-3 mt-10">
             <audio onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedData={() => setDuration(audioRef.current.duration)} autoPlay={playing} src={audioURL} ref={audioRef}></audio>

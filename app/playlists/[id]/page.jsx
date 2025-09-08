@@ -64,7 +64,7 @@ export default function PlaylistDetailPage() {
       </div>
 
       <div className="grid gap-2">
-        {songs.length ? songs.map((s) => (
+        {songs.length ? songs.map((s, idx) => (
           <div key={s.id} className="p-3 rounded-md border flex items-center justify-between">
             <div className="flex items-center gap-3">
               {s.image ? <img src={s.image} alt={s.name} className="h-10 w-10 rounded object-cover" /> : <div className="h-10 w-10 rounded bg-secondary" />}
@@ -74,7 +74,7 @@ export default function PlaylistDetailPage() {
               </div>
             </div>
             <Button size="sm" asChild>
-              <Link href={`/${s.id || s.songId}`}>Play</Link>
+              <Link href={`/${s.id || s.songId}?playlist=${params.id}&pos=${idx}`}>Play</Link>
             </Button>
           </div>
         )) : (
