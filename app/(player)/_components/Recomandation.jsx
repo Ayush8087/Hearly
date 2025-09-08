@@ -15,32 +15,29 @@ export default function Recomandation({ id }) {
     const next = useContext(NextContext);
 
     const getData = async () => {
-        await getSongsSuggestions(id)
-            .then(res => res.json())
-            .then(payload => {
-                const results = Array.isArray(payload?.data) ? payload.data : [];
-                if (results.length > 0) {
-                    setData(results);
-                    const randomIndex = Math.floor(Math.random() * results.length);
-                    const d = results[randomIndex];
-                    if (d) {
-                        next.setNextData({
-                            id: d.id,
-                            name: d.name,
-                            artist: d?.artists?.primary?.[0]?.name || "unknown",
-                            album: d?.album?.name,
-                            image: d?.image?.[2]?.url || d?.image?.[1]?.url || d?.image?.[0]?.url || ""
-                        });
-                    }
-                } else {
-                    setData(false);
+        try {
+            const res = await getSongsSuggestions(id);
+            const payload = await res.json();
+            const results = Array.isArray(payload?.data) ? payload.data : [];
+            setData(results.length ? results : false);
+            if (results.length) {
+                const randomIndex = Math.floor(Math.random() * results.length);
+                const d = results[randomIndex];
+                if (d) {
+                    next.setNextData({
+                        id: d.id,
+                        name: d.name,
+                        artist: d?.artists?.primary?.[0]?.name || "unknown",
+                        album: d?.album?.name,
+                        image: d?.image?.[2]?.url || d?.image?.[1]?.url || d?.image?.[0]?.url || ""
+                    });
                 }
-                setLoading(false);
-            })
-            .catch(() => {
-                setData(false);
-                setLoading(false);
-            });
+            }
+        } catch {
+            setData(false);
+        } finally {
+            setLoading(false);
+        }
     }
     useEffect(() => {
         getData();

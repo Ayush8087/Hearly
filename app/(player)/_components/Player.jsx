@@ -164,9 +164,8 @@ export default function Player({ id }) {
         };
     }, []);
     useEffect(() => {
-        const autoplayNext = async () => {
-            if (isLooping || duration === 0) return;
-            if (currentTime < duration - 0.25) return;
+        const handleEnded = async () => {
+            if (isLooping) return;
 
             const playlistId = params.get('playlist');
             const posParam = params.get('pos');
@@ -188,13 +187,29 @@ export default function Player({ id }) {
                 } catch {}
             }
 
+            // Fallback to recommendation
             if (next?.nextData?.id) {
                 const base = `https://${window.location.host}`;
                 window.location.href = `${base}/${next.nextData.id}`;
+                return;
             }
+            try {
+                const res = await getSongsSuggestions(id);
+                const j = await res.json();
+                const cand = Array.isArray(j?.data) ? j.data[0] : null;
+                if (cand?.id) {
+                    const base = `https://${window.location.host}`;
+                    window.location.href = `${base}/${cand.id}`;
+                }
+            } catch {}
         };
-        autoplayNext();
-    }, [currentTime, duration, isLooping, params]);
+
+        const el = audioRef.current;
+        if (el) el.addEventListener('ended', handleEnded);
+        return () => {
+            if (el) el.removeEventListener('ended', handleEnded);
+        };
+    }, [id, isLooping, params, next?.nextData?.id]);
     return (
         <div className="mb-3 mt-10">
             <audio onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedData={() => setDuration(audioRef.current.duration)} autoPlay={playing} src={audioURL} ref={audioRef}></audio>
