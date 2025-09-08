@@ -3,10 +3,11 @@ import { ModeToggle } from "../ModeToggle";
 import Logo from "./logo";
 import { Button } from "../ui/button";
 import Search from "./search";
-import { ChevronDown, ChevronLeft, Share2 } from "lucide-react";
+import { ChevronDown, ChevronLeft, Share2, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export default function Header() {
     const path = usePathname();
@@ -36,12 +37,23 @@ export default function Header() {
                         <Link href="/playlists">Playlists</Link>
                     </Button>
                     {session ? (
-                        <>
-                            <Button variant="ghost" className="pointer-events-none opacity-80">
-                                {session.user?.email || "Profile"}
-                            </Button>
-                            <Button variant="outline" onClick={() => signOut({ callbackUrl: "https://hearly.onrender.com/" })}>Logout</Button>
-                        </>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="h-9 px-3">
+                                    <User className="w-4 h-4 mr-2" /> Profile
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>Signed in</DropdownMenuLabel>
+                                <DropdownMenuItem className="opacity-80 whitespace-pre-wrap break-all select-text">
+                                    {session.user?.email || "Unknown"}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "https://hearly.onrender.com/" })}>
+                                    Logout
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     ) : (
                         <div className="flex items-center gap-2">
                             <Button variant="ghost" asChild>
