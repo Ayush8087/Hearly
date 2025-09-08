@@ -11,6 +11,7 @@ export default function PlaylistDetailPage() {
   const [playlist, setPlaylist] = useState(null);
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reordering, setReordering] = useState(false);
 
   const load = async () => {
     const res = await fetch(`/api/playlists/${params.id}`);
@@ -60,7 +61,10 @@ export default function PlaylistDetailPage() {
           <h1 className="text-xl font-semibold">{playlist.name}</h1>
           <p className="text-xs text-muted-foreground">{playlist.songs?.length || 0} songs</p>
         </div>
-        <Button variant="ghost" asChild><Link href="/playlists">Back</Link></Button>
+        <div className="flex items-center gap-2">
+          <Button variant={reordering ? "secondary" : "ghost"} onClick={() => setReordering(v => !v)}>{reordering ? "Done" : "Reorder"}</Button>
+          <Button variant="ghost" asChild><Link href="/playlists">Back</Link></Button>
+        </div>
       </div>
 
       <div className="grid gap-2">
@@ -73,14 +77,45 @@ export default function PlaylistDetailPage() {
                 <p className="text-xs text-muted-foreground">{s.artist || ""}</p>
               </div>
             </div>
-            <Button size="sm" asChild>
-              <Link href={`/${s.id || s.songId}?playlist=${params.id}&pos=${idx}`}>Play</Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              {reordering ? (
+                <>
+                  <Button size="sm" variant="secondary" onClick={() => {
+                    if (idx === 0) return;
+                    const nextOrder = [...songs];
+                    const [item] = nextOrder.splice(idx, 1);
+                    nextOrder.splice(idx - 1, 0, item);
+                    setSongs(nextOrder);
+                  }}>Up</Button>
+                  <Button size="sm" variant="secondary" onClick={() => {
+                    if (idx === songs.length - 1) return;
+                    const nextOrder = [...songs];
+                    const [item] = nextOrder.splice(idx, 1);
+                    nextOrder.splice(idx + 1, 0, item);
+                    setSongs(nextOrder);
+                  }}>Down</Button>
+                </>
+              ) : (
+                <Button size="sm" asChild>
+                  <Link href={`/${s.id || s.songId}?playlist=${params.id}&pos=${idx}`}>Play</Link>
+                </Button>
+              )}
+            </div>
           </div>
         )) : (
           <p className="text-sm text-muted-foreground">No songs yet.</p>
         )}
       </div>
+
+      {reordering && songs.length > 0 && (
+        <div className="mt-4 flex gap-2">
+          <Button onClick={async () => {
+            const ids = songs.map(s => s.id || s.songId);
+            await fetch(`/api/playlists/${params.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ songs: ids }) });
+          }}>Save order</Button>
+          <Button variant="ghost" onClick={() => load()}>Reset</Button>
+        </div>
+      )}
     </div>
   );
 }
