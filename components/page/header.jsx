@@ -36,7 +36,12 @@ export default function Header() {
                         <Link href="/playlists">Playlists</Link>
                     </Button>
                     {session ? (
-                        <Button variant="outline" onClick={() => signOut({ callbackUrl: "https://hearly.onrender.com/" })}>Logout</Button>
+                        <>
+                            <Button variant="ghost" className="pointer-events-none opacity-80">
+                                {session.user?.email || "Profile"}
+                            </Button>
+                            <Button variant="outline" onClick={() => signOut({ callbackUrl: "https://hearly.onrender.com/" })}>Logout</Button>
+                        </>
                     ) : (
                         <div className="flex items-center gap-2">
                             <Button variant="ghost" asChild>
