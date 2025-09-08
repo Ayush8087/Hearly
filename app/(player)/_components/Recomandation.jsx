@@ -6,7 +6,7 @@ import SongCard from "@/components/cards/song";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NextContext } from "@/hooks/use-context";
-import { getSongsSuggestions } from "@/lib/fetch";
+import { getSongsById, getSongsByQuery, getSongsSuggestions } from "@/lib/fetch";
 import { useContext, useEffect, useState } from "react";
 
 export default function Recomandation({ id }) {
@@ -28,6 +28,21 @@ export default function Recomandation({ id }) {
             const byId = new Map(all.map(c => [c.id, c]));
             let results = ids.map(rid => byId.get(rid)).filter(Boolean);
             if (!results.length) results = all;
+            // ultimate fallback: search by primary artist of current song
+            if (!results.length) {
+                try {
+                    const metaRes = await getSongsById(id);
+                    const meta = await metaRes.json();
+                    const song = meta?.data?.[0];
+                    const artistName = song?.artists?.primary?.[0]?.name;
+                    if (artistName) {
+                        const search = await getSongsByQuery(encodeURIComponent(artistName));
+                        const sj = await search.json();
+                        const sdata = Array.isArray(sj?.data) ? sj.data : [];
+                        results = sdata.slice(0, 10);
+                    }
+                } catch {}
+            }
             setData(results.length ? results : false);
             if (results.length) {
                 const d = results[0];
