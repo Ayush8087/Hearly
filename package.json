@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "copy prisma\\schema.production.prisma prisma\\schema.prisma && prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "build:local": "next build"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
