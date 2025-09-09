@@ -111,7 +111,7 @@ export default function Player({ id }) {
                     const nextIndex = currentIndex + 1;
                     const nextId = songIds[nextIndex];
                     if (nextId) {
-                        const base = `https://${window.location.host}`;
+                        const base = window.location.origin;
                         window.location.href = `${base}/${nextId}?playlist=${playlistId}&pos=${nextIndex}`;
                         return;
                     }
@@ -123,7 +123,7 @@ export default function Player({ id }) {
             const j = rec.ok ? await rec.json() : { recommendations: [] };
             const nextId = Array.isArray(j?.recommendations) ? j.recommendations[0] : null;
             if (nextId) {
-                const base = `https://${window.location.host}`;
+                const base = window.location.origin;
                 window.location.href = `${base}/${nextId}`;
             }
         } catch {}
@@ -143,7 +143,7 @@ export default function Player({ id }) {
                     const prevIndex = currentIndex - 1;
                     const prevId = songIds[prevIndex];
                     if (prevId) {
-                        const base = `https://${window.location.host}`;
+                        const base = window.location.origin;
                         window.location.href = `${base}/${prevId}?playlist=${playlistId}&pos=${prevIndex}`;
                         return;
                     }
