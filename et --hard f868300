@@ -1,0 +1,10 @@
+[33maac5e5c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Switch to PostgreSQL for persistent data storage
+[33m7beb626[m Add debugging logs for login issues
+[33meda9bba[m fixing prior error
+[33mc2ef781[m Fix build command for Linux deployment
+[33mf868300[m[33m ([m[1;32msecondary[m[33m)[m  Complete fix for authentication and database issues
+[33m600df67[m[33m ([m[1;31morigin/secondary[m[33m)[m  Fix login issues and improve deployment setup
+[33ma8dff5f[m Merge remote changes with hosting fixes
+[33mfc5aab5[m Remove .env.example from repository
+[33m1abec73[m Remove .env.example from repository
+[33m49191a0[m  Fix hosting issues and security improvements

@@ -18,13 +18,21 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  if (!prisma) return new Response("Server not ready (database)", { status: 500 });
-  const user = await requireSession();
-  if (!user) return new Response("Unauthorized", { status: 401 });
-  const { name } = await req.json();
-  if (!name) return new Response("Name required", { status: 400 });
-  const created = await prisma.playlist.create({ data: { name, userId: user.id } });
-  return Response.json(created, { status: 201 });
+  try {
+    if (!prisma) return new Response("Server not ready (database)", { status: 500 });
+    const user = await requireSession();
+    if (!user) return new Response("Unauthorized", { status: 401 });
+    const { name } = await req.json();
+    if (!name) return new Response("Name required", { status: 400 });
+    
+    console.log('Creating playlist for user:', user.id, 'with name:', name);
+    const created = await prisma.playlist.create({ data: { name, userId: user.id } });
+    console.log('Playlist created successfully:', created.id);
+    return Response.json(created, { status: 201 });
+  } catch (error) {
+    console.error('Error creating playlist:', error);
+    return new Response(JSON.stringify({ error: "Failed to create playlist", details: error.message }), { status: 500 });
+  }
 }
 
 
