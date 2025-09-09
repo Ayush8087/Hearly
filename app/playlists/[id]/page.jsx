@@ -96,9 +96,16 @@ export default function PlaylistDetailPage() {
                   }}>Down</Button>
                 </>
               ) : (
-                <Button size="sm" asChild>
-                  <Link href={`/${s.id || s.songId}?playlist=${params.id}&pos=${idx}`}>Play</Link>
-                </Button>
+                <>
+                  <Button size="sm" asChild>
+                    <Link href={`/${s.id || s.songId}?playlist=${params.id}&pos=${idx}`}>Play</Link>
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={async () => {
+                    const songId = s.id || s.songId;
+                    await fetch(`/api/playlists/${params.id}/songs/${songId}`, { method: 'DELETE' });
+                    setSongs(prev => prev.filter(x => (x.id || x.songId) !== songId));
+                  }}>Remove</Button>
+                </>
               )}
             </div>
           </div>
