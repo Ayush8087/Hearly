@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "cp prisma/schema.production.prisma prisma/schema.prisma && prisma generate && next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
@@ -39,8 +39,7 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.1",
-    "@google/generative-ai": "^0.21.0",
-    "openai": "^4.56.0"
+    "@google/generative-ai": "^0.21.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",
