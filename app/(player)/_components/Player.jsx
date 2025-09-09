@@ -97,6 +97,64 @@ export default function Player({ id }) {
         }
     }
 
+    const handleNextTrack = async () => {
+        try {
+            const playlistId = params.get('playlist');
+            const posParam = params.get('pos');
+            const currentIndex = posParam ? parseInt(posParam, 10) : null;
+
+            if (playlistId && currentIndex !== null && !Number.isNaN(currentIndex)) {
+                const res = await fetch(`/api/playlists/${playlistId}`);
+                if (res.ok) {
+                    const list = await res.json();
+                    const songIds = (list?.songs || []).map(s => s.songId);
+                    const nextIndex = currentIndex + 1;
+                    const nextId = songIds[nextIndex];
+                    if (nextId) {
+                        const base = `https://${window.location.host}`;
+                        window.location.href = `${base}/${nextId}?playlist=${playlistId}&pos=${nextIndex}`;
+                        return;
+                    }
+                }
+            }
+
+            // Normal mode: use recommendation API
+            const rec = await fetch(`/api/recommendations?songId=${encodeURIComponent(id)}`);
+            const j = rec.ok ? await rec.json() : { recommendations: [] };
+            const nextId = Array.isArray(j?.recommendations) ? j.recommendations[0] : null;
+            if (nextId) {
+                const base = `https://${window.location.host}`;
+                window.location.href = `${base}/${nextId}`;
+            }
+        } catch {}
+    };
+
+    const handlePrevTrack = async () => {
+        try {
+            const playlistId = params.get('playlist');
+            const posParam = params.get('pos');
+            const currentIndex = posParam ? parseInt(posParam, 10) : null;
+
+            if (playlistId && currentIndex !== null && !Number.isNaN(currentIndex)) {
+                const res = await fetch(`/api/playlists/${playlistId}`);
+                if (res.ok) {
+                    const list = await res.json();
+                    const songIds = (list?.songs || []).map(s => s.songId);
+                    const prevIndex = currentIndex - 1;
+                    const prevId = songIds[prevIndex];
+                    if (prevId) {
+                        const base = `https://${window.location.host}`;
+                        window.location.href = `${base}/${prevId}?playlist=${playlistId}&pos=${prevIndex}`;
+                        return;
+                    }
+                }
+            }
+
+            // Normal mode: try browser history as a simple prev
+            window.history.back();
+        } catch {}
+    };
+
     const addToPlaylist = async () => {
         try {
             const res = await fetch('/api/playlists/add-song', { method: 'POST', body: JSON.stringify({ songId: id }) });
@@ -266,6 +324,9 @@ export default function Player({ id }) {
                                         {playing ? "Pause" : "Play"}
                                     </Button>
                                     <div className="flex items-center gap-2 sm:gap-3 sm:mt-0">
+                                        <Button size="icon" variant="ghost" onClick={handlePrevTrack}>
+                                            <UndoDot className="h-4 w-4" />
+                                        </Button>
                                         <Button size="icon" variant="ghost" onClick={loopSong}>
                                             {!isLooping ? <Repeat className="h-4 w-4" /> : <Repeat1 className="h-4 w-4" />}
                                         </Button>
@@ -275,6 +336,9 @@ export default function Player({ id }) {
                                             ) : (
                                                 <Download className="h-4 w-4" />
                                             )}
+                                        </Button>
+                                        <Button size="icon" variant="ghost" onClick={handleNextTrack}>
+                                            <RedoDot className="h-4 w-4" />
                                         </Button>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
