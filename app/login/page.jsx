@@ -14,12 +14,26 @@ export default function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const res = await signIn("credentials", { email, password, redirect: false });
-    if (res?.error) {
-      setError("Invalid credentials");
-      return;
+    try {
+      console.log('Attempting login for:', email);
+      const res = await signIn("credentials", { email, password, redirect: false });
+      console.log('Login response:', res);
+      
+      if (res?.error) {
+        setError(`Login failed: ${res.error}`);
+        return;
+      }
+      
+      if (res?.ok) {
+        console.log('Login successful, redirecting...');
+        router.replace("/");
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError("Login failed. Please try again.");
     }
-    router.replace("/");
   };
 
   return (

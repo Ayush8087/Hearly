@@ -27,12 +27,37 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
-        if (!user) return null;
-        const valid = await bcrypt.compare(credentials.password, user.password);
-        if (!valid) return null;
-        return { id: user.id, email: user.email, name: user.name };
+        try {
+          console.log('Auth attempt for email:', credentials?.email);
+          
+          if (!credentials?.email || !credentials?.password) {
+            console.log('Missing credentials');
+            return null;
+          }
+          
+          if (!prisma) {
+            console.log('Prisma not initialized');
+            return null;
+          }
+          
+          const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+          if (!user) {
+            console.log('User not found:', credentials.email);
+            return null;
+          }
+          
+          const valid = await bcrypt.compare(credentials.password, user.password);
+          if (!valid) {
+            console.log('Invalid password for:', credentials.email);
+            return null;
+          }
+          
+          console.log('Login successful for:', credentials.email);
+          return { id: user.id, email: user.email, name: user.name };
+        } catch (error) {
+          console.error('Auth error:', error);
+          return null;
+        }
       },
     }),
   ],
