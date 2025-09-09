@@ -33,6 +33,8 @@ model PlaylistSong {
   playlistId String
   songId     String
   createdAt  DateTime @default(now())
+
+  @@unique([playlistId, songId])
 }
 
 

@@ -33,7 +33,7 @@ export async function PUT(req, { params }) {
   if (Array.isArray(songs)) {
     await prisma.playlistSong.deleteMany({ where: { playlistId: params.id } });
     if (songs.length) {
-      await prisma.playlistSong.createMany({ data: songs.map((songId) => ({ playlistId: params.id, songId })) });
+      await prisma.playlistSong.createMany({ data: songs.map((songId) => ({ playlistId: params.id, songId })), skipDuplicates: true });
     }
   }
   const result = await prisma.playlist.findUnique({
