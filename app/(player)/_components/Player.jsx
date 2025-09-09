@@ -33,14 +33,22 @@ export default function Player({ id }) {
     const getSong = async () => {
         try {
             const get = await getSongsById(id);
+            if (!get || !get.ok) {
+                toast.error('Failed to load song data');
+                return;
+            }
             const payload = await get.json();
             const song = payload?.data?.[0];
-            if (!song) throw new Error('No song data');
+            if (!song) {
+                toast.error('Song not found');
+                return;
+            }
             setData(song);
             const urls = song?.downloadUrl || [];
             const preferred = urls[2]?.url || urls[1]?.url || urls[0]?.url || "";
             setAudioURL(preferred);
         } catch (e) {
+            console.error('Error loading song:', e);
             toast.error('Something went wrong!');
         }
     };
