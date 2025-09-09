@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "build:local": "next build"
+    "build:local": "next build",
+    "setup:postgres": "node scripts/setup-postgres.js",
+    "migrate:deploy": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
