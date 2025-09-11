@@ -6,10 +6,10 @@ import bcrypt from "bcrypt";
 const handler = NextAuth({
   session: { strategy: "jwt" },
   trustHost: true,
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || (process.env.NODE_ENV === 'development' ? 'dev-secret' : undefined),
   callbacks: {
     async redirect({ url, baseUrl }) {
-      const siteUrl = process.env.NEXTAUTH_URL || 'https://hearly.onrender.com';
+      const siteUrl = process.env.NEXTAUTH_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://hearly.onrender.com');
       const effectiveBase = siteUrl || baseUrl;
       try {
         const target = new URL(url, effectiveBase);
