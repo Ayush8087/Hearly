@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { getSongsById, getSongsLyricsById } from "@/lib/fetch";
-import { Download, Pause, Play, RedoDot, UndoDot, Repeat, Loader2, BookmarkPlus, Repeat1, Share2 } from "lucide-react";
+import { Download, Pause, Play, RedoDot, UndoDot, Repeat, Loader2, BookmarkPlus, Repeat1, Share2, Shuffle } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -23,6 +23,8 @@ export default function Player({ id }) {
     const [duration, setDuration] = useState(0);
     const [isDownloading, setIsDownloading] = useState(false);
     const [isLooping, setIsLooping] = useState(false);
+    const [isShuffling, setIsShuffling] = useState(false);
+    const [repeatMode, setRepeatMode] = useState("off"); // off | one | all
     const [audioURL, setAudioURL] = useState("");
     const [playlists, setPlaylists] = useState([]);
     const [newPlaylistName, setNewPlaylistName] = useState("");
@@ -90,9 +92,21 @@ export default function Player({ id }) {
         setCurrentTime(seekTime);
     };
 
-    const loopSong = () => {
-        audioRef.current.loop = !audioRef.current.loop;
-        setIsLooping(!isLooping);
+    const toggleShuffle = () => {
+        const next = !isShuffling;
+        setIsShuffling(next);
+        try { localStorage.setItem("shuffle", next ? "1" : "0"); } catch {}
+    };
+
+    const cycleRepeatMode = () => {
+        let next = "off";
+        if (repeatMode === "off") next = "one";
+        else if (repeatMode === "one") next = "all";
+        else next = "off";
+        setRepeatMode(next);
+        try { localStorage.setItem("repeat", next); } catch {}
+        if (audioRef.current) audioRef.current.loop = next === "one";
+        setIsLooping(next === "one");
     };
 
     const handleShare = () => {
@@ -116,7 +130,16 @@ export default function Player({ id }) {
                 if (res.ok) {
                     const list = await res.json();
                     const songIds = (list?.songs || []).map(s => s.songId);
-                    const nextIndex = currentIndex + 1;
+                    let nextIndex = currentIndex + 1;
+                    if (isShuffling && songIds.length > 1) {
+                        let rand = currentIndex;
+                        while (rand === currentIndex) {
+                            rand = Math.floor(Math.random() * songIds.length);
+                        }
+                        nextIndex = rand;
+                    } else if (nextIndex >= songIds.length && repeatMode === "all") {
+                        nextIndex = 0;
+                    }
                     const nextId = songIds[nextIndex];
                     if (nextId) {
                         const base = window.location.origin;
@@ -148,7 +171,16 @@ export default function Player({ id }) {
                 if (res.ok) {
                     const list = await res.json();
                     const songIds = (list?.songs || []).map(s => s.songId);
-                    const prevIndex = currentIndex - 1;
+                    let prevIndex = currentIndex - 1;
+                    if (isShuffling && songIds.length > 1) {
+                        let rand = currentIndex;
+                        while (rand === currentIndex) {
+                            rand = Math.floor(Math.random() * songIds.length);
+                        }
+                        prevIndex = rand;
+                    } else if (prevIndex < 0 && repeatMode === "all") {
+                        prevIndex = songIds.length - 1;
+                    }
                     const prevId = songIds[prevIndex];
                     if (prevId) {
                         const base = window.location.origin;
@@ -209,6 +241,16 @@ export default function Player({ id }) {
         fetchPlaylists();
         localStorage.setItem("last-played", id);
         localStorage.removeItem("p");
+        try {
+            const s = localStorage.getItem("shuffle");
+            setIsShuffling(s === "1");
+            const r = localStorage.getItem("repeat");
+            if (r === "one" || r === "all" || r === "off") {
+                setRepeatMode(r);
+                if (audioRef.current) audioRef.current.loop = r === "one";
+                setIsLooping(r === "one");
+            }
+        } catch {}
         if (current) {
             audioRef.current.currentTime = parseFloat(current + 1);
         }
@@ -231,7 +273,7 @@ export default function Player({ id }) {
     }, []);
     useEffect(() => {
         const handleEnded = async () => {
-            if (isLooping) return;
+            if (repeatMode === "one") return; // native loop handles it
 
             const playlistId = params.get('playlist');
             const posParam = params.get('pos');
@@ -243,7 +285,16 @@ export default function Player({ id }) {
                     if (!res.ok) throw new Error('Failed to load playlist');
                     const list = await res.json();
                     const songIds = (list?.songs || []).map(s => s.songId);
-                    const nextIndex = currentIndex + 1;
+                    let nextIndex = currentIndex + 1;
+                    if (isShuffling && songIds.length > 1) {
+                        let rand = currentIndex;
+                        while (rand === currentIndex) {
+                            rand = Math.floor(Math.random() * songIds.length);
+                        }
+                        nextIndex = rand;
+                    } else if (nextIndex >= songIds.length && repeatMode === "all") {
+                        nextIndex = 0;
+                    }
                     const nextId = songIds[nextIndex];
                     if (nextId) {
                         const base = `https://${window.location.host}`;
@@ -275,7 +326,7 @@ export default function Player({ id }) {
         return () => {
             if (el) el.removeEventListener('ended', handleEnded);
         };
-    }, [id, isLooping, params, next?.nextData?.id]);
+    }, [id, isLooping, params, next?.nextData?.id, isShuffling, repeatMode]);
     return (
         <div className="mb-3 mt-10">
             <audio onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedData={() => setDuration(audioRef.current.duration)} autoPlay={playing} src={audioURL} ref={audioRef}></audio>
@@ -335,8 +386,11 @@ export default function Player({ id }) {
                                         <Button size="icon" variant="ghost" onClick={handlePrevTrack}>
                                             <UndoDot className="h-4 w-4" />
                                         </Button>
-                                        <Button size="icon" variant="ghost" onClick={loopSong}>
-                                            {!isLooping ? <Repeat className="h-4 w-4" /> : <Repeat1 className="h-4 w-4" />}
+                                        <Button size="icon" variant={isShuffling ? "default" : "ghost"} onClick={toggleShuffle}>
+                                            <Shuffle className="h-4 w-4" />
+                                        </Button>
+                                        <Button size="icon" variant={repeatMode !== "off" ? "default" : "ghost"} onClick={cycleRepeatMode}>
+                                            {repeatMode === "one" ? <Repeat1 className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}
                                         </Button>
                                         <Button size="icon" variant="ghost" onClick={downloadSong}>
                                             {isDownloading ? (
