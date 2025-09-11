@@ -36,9 +36,6 @@ export default function Header() {
                     <Button variant="ghost" asChild>
                         <Link href="/playlists">Playlists</Link>
                     </Button>
-                    <Button variant="ghost" asChild>
-                        <Link href="/admin/users">Admin</Link>
-                    </Button>
                     {session ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
