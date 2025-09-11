@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate --schema prisma/schema.production.prisma && next build",
-    "start": "next start",
+    "build": "prisma generate && next build",
+    "start": "node scripts/init-db.js && node scripts/create-test-user.js && next start",
     "lint": "next lint",
-    "postinstall": "prisma generate --schema prisma/schema.production.prisma",
+    "postinstall": "prisma generate",
     "build:local": "next build"
   },
   "dependencies": {

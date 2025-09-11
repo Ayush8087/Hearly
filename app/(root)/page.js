@@ -14,36 +14,18 @@ export default function Page() {
 
   const getSongs = async (e, type) => {
     const get = await getSongsByQuery(e);
-    if (!get) {
-      console.error('Failed to fetch songs for:', e);
-      return;
-    }
-    try {
-      const data = await get.json();
-      console.log('Songs data for', e, ':', data);
-      if (type === "latest") {
-        setLatest(data.data?.results || []);
-      } else if (type === "popular") {
-        setPopular(data.data?.results || []);
-      }
-    } catch (error) {
-      console.error('Error parsing songs JSON:', error);
+    const data = await get.json();
+    if (type === "latest") {
+      setLatest(data.data.results);
+    } else if (type === "popular") {
+      setPopular(data.data.results);
     }
   };
 
   const getAlbum = async () => {
     const get = await searchAlbumByQuery("latest");
-    if (!get) {
-      console.error('Failed to fetch albums');
-      return;
-    }
-    try {
-      const data = await get.json();
-      console.log('Albums data:', data);
-      setAlbums(data.data?.results || []);
-    } catch (error) {
-      console.error('Error parsing albums JSON:', error);
-    }
+    const data = await get.json();
+    setAlbums(data.data.results);
   };
 
   useEffect(() => {

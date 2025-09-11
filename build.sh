@@ -2,13 +2,10 @@
 # Build script for hosting platforms
 
 echo "Installing dependencies..."
-npm ci || npm install
+npm install
 
-echo "Generating Prisma client (production schema)..."
-npx prisma generate --schema prisma/schema.production.prisma
-
-echo "Applying database migrations..."
-npx prisma migrate deploy --schema prisma/schema.production.prisma
+echo "Generating Prisma client..."
+npx prisma generate
 
 echo "Building Next.js application..."
 npm run build
