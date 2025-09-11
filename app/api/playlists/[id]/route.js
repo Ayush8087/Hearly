@@ -31,12 +31,28 @@ export async function PUT(req, { params }) {
     await prisma.playlist.update({ where: { id: params.id }, data: { name } });
   }
   if (Array.isArray(songs)) {
-    if (songs.length > 0) {
-      await prisma.playlistSong.deleteMany({ where: { playlistId: params.id } });
-      await prisma.playlistSong.createMany({ data: songs.map((songId) => ({ playlistId: params.id, songId })), skipDuplicates: true });
-    } else {
-      // Ignore empty array to avoid accidentally wiping playlist on bad client state
+    // Defensive: only accept reorder if the provided set matches existing set
+    const existing = await prisma.playlistSong.findMany({ where: { playlistId: params.id }, select: { songId: true } });
+    const existingIds = existing.map(s => s.songId);
+    const providedIds = songs.map(String);
+
+    // Reject empty payloads explicitly
+    if (providedIds.length === 0) {
+      return new Response(JSON.stringify({ error: "Songs array is empty; refusing to clear playlist" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
+
+    // Validate the same multiset (same items, any order)
+    const a = [...existingIds].sort();
+    const b = [...providedIds].sort();
+    const same = a.length === b.length && a.every((v, i) => v === b[i]);
+    if (!same) {
+      return new Response(JSON.stringify({ error: "Songs payload must contain exactly the existing songs" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    }
+
+    await prisma.$transaction([
+      prisma.playlistSong.deleteMany({ where: { playlistId: params.id } }),
+      prisma.playlistSong.createMany({ data: providedIds.map((songId) => ({ playlistId: params.id, songId })), skipDuplicates: true })
+    ]);
   }
   const result = await prisma.playlist.findUnique({
     where: { id: params.id },
