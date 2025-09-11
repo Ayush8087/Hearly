@@ -15,10 +15,10 @@
 Set these on your hosting platform:
 
 ```bash
-DATABASE_URL="postgresql://username:password@host:port/database"
-NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
-NEXTAUTH_URL="https://your-production-domain.com"
-NEXT_PUBLIC_API_URL="https://saavn.dev/api/"
+DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:<PORT>/<DATABASE>"
+NEXTAUTH_SECRET="<YOUR_GENERATED_SECRET>"
+NEXTAUTH_URL="https://<YOUR_DOMAIN>"
+NEXT_PUBLIC_API_URL="https://<YOUR_API_ENDPOINT>"
 ```
 
 ### 2. Database Setup
