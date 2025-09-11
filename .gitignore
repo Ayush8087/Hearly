@@ -45,3 +45,10 @@ next-env.d.ts
 
 # temp/test files
 tmp_api_check.json
+
+
+# bad accidental files
+tatus
+et --hard f868300
+econdary
+.env.example
